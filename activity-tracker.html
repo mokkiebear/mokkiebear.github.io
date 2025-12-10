@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Activity Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: #555;
+            margin: 20px 0 15px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .button.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .button.small {
+            padding: 8px 16px;
+            font-size: 14px;
+            width: auto;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .activity-card strong {
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .activity-type {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            font-size: 12px;
+            margin-left: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .stat-box {
+            padding: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-box strong {
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .timer-display {
+            text-align: center;
+            font-size: 3em;
+            font-weight: bold;
+            margin: 30px 0;
+            color: #667eea;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .button-group .button {
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        thead {
+            background: #f0f0f0;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .time-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .time-input-group .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .mode-toggle {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mode-toggle label {
+            display: inline;
+            margin: 0 5px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .mode-toggle input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .timer-display {
+                font-size: 2.5em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="message" class="message"></div>
+
+        <!-- Configuration Screen -->
+        <div id="config-screen" class="screen active">
+            <h1>🏋️ Activity Tracker</h1>
+
+            <div class="form-group">
+                <label for="gistId">Gist ID</label>
+                <input type="text" id="gistId" placeholder="Enter your Gist ID">
+                <div class="help-text">Find this in your Gist URL: gist.github.com/username/GIST_ID</div>
+            </div>
+
+            <div class="form-group">
+                <label for="token">GitHub Personal Access Token</label>
+                <input type="password" id="token" placeholder="ghp_...">
+                <div class="help-text">Create at: github.com/settings/tokens (needs 'gist' scope)</div>
+            </div>
+
+            <button class="button" onclick="loadGist()">📥 Load Activities</button>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <h1>🏋️ Activity Tracker</h1>
+
+            <h2>Today</h2>
+            <div id="today-activities"></div>
+
+            <h2>This Week</h2>
+            <div id="week-activities"></div>
+
+            <h2>Track Activity</h2>
+            <div id="activities-list"></div>
+
+            <button class="button secondary" onclick="showAddActivity()">➕ Add New Activity</button>
+            <button class="button small" style="margin-top: 15px;" onclick="showConfig()">⚙️ Settings</button>
+        </div>
+
+        <!-- Add Activity Screen -->
+        <div id="add-activity-screen" class="screen">
+            <a href="#" class="back-link" onclick="showDashboard(); return false;">← Back to Dashboard</a>
+            <h1>Add New Activity</h1>
+
+            <div class="form-group">
+                <label for="activity-id">Activity ID</label>
+                <input type="text" id="activity-id" placeholder="e.g., pushups">
+                <div class="help-text">Lowercase letters, numbers, and hyphens only</div>
+            </div>
+
+            <div class="form-group">
+                <label for="activity-name">Activity Name</label>
+                <input type="text" id="activity-name" placeholder="e.g., Push-ups">
+            </div>
+
+            <div class="form-group">
+                <label for="activity-type">Activity Type</label>
+                <select id="activity-type">
+                    <option value="numeric">Numeric (count-based, e.g., reps)</option>
+                    <option value="timer">Timer (duration-based, e.g., plank)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="activity-description">Description (optional)</label>
+                <textarea id="activity-description" rows="3" placeholder="Enter description"></textarea>
+            </div>
+
+            <button class="button success" onclick="saveNewActivity()">💾 Save Activity</button>
+        </div>
+
+        <!-- Activity Detail Screen -->
+        <div id="activity-detail-screen" class="screen">
+            <a href="#" class="back-link" onclick="showDashboard(); return false;">← Back to Dashboard</a>
+            <h1 id="activity-title"></h1>
+
+            <div class="button-group">
+                <button class="button" onclick="showLogEntry()">📝 Log Entry</button>
+                <button class="button secondary" onclick="showHistory()">📊 View History</button>
+            </div>
+        </div>
+
+        <!-- Log Entry Screen (Numeric) -->
+        <div id="log-numeric-screen" class="screen">
+            <a href="#" class="back-link" onclick="showActivityDetail(); return false;">← Back</a>
+            <h1 id="log-numeric-title"></h1>
+
+            <div class="form-group">
+                <label for="numeric-count">Count</label>
+                <input type="number" id="numeric-count" placeholder="Enter count" min="1">
+            </div>
+
+            <button class="button success" onclick="saveNumericEntry()">💾 Save Entry</button>
+        </div>
+
+        <!-- Log Entry Screen (Timer) -->
+        <div id="log-timer-screen" class="screen">
+            <a href="#" class="back-link" onclick="showActivityDetail(); return false;">← Back</a>
+            <h1 id="log-timer-title"></h1>
+
+            <div class="mode-toggle">
+                <input type="radio" id="mode-timer" name="timer-mode" value="timer" checked onchange="toggleTimerMode()">
+                <label for="mode-timer">⏱️ Use Timer</label>
+                <input type="radio" id="mode-manual" name="timer-mode" value="manual" onchange="toggleTimerMode()">
+                <label for="mode-manual">✏️ Manual Entry</label>
+            </div>
+
+            <div id="timer-mode-section">
+                <div class="timer-display" id="timer-display">0m 0s</div>
+
+                <div class="button-group">
+                    <button class="button" id="btn-start" onclick="startTimer()">▶️ Start</button>
+                    <button class="button secondary" id="btn-stop" onclick="stopTimer()" disabled>⏸️ Stop</button>
+                </div>
+
+                <div id="timer-save-section" style="display: none; margin-top: 20px;">
+                    <div class="button-group">
+                        <button class="button success" onclick="saveTimerEntry()">💾 Save Record</button>
+                        <button class="button secondary" onclick="resetTimer()">🗑️ Discard</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="manual-mode-section" style="display: none;">
+                <div class="time-input-group">
+                    <div class="form-group">
+                        <label for="manual-minutes">Minutes</label>
+                        <input type="number" id="manual-minutes" placeholder="0" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-seconds">Seconds</label>
+                        <input type="number" id="manual-seconds" placeholder="0" min="0" max="59" value="0">
+                    </div>
+                </div>
+                <button class="button success" onclick="saveManualTimerEntry()">💾 Save Entry</button>
+            </div>
+        </div>
+
+        <!-- History Screen -->
+        <div id="history-screen" class="screen">
+            <a href="#" class="back-link" onclick="showActivityDetail(); return false;">← Back</a>
+            <h1 id="history-title"></h1>
+
+            <div id="history-stats" class="stats-container"></div>
+            <div id="history-table"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let gistId = '';
+        let token = '';
+        let gistData = null;
+        let currentActivity = null;
+
+        // Timer state
+        let startTime = null;
+        let timerInterval = null;
+        let elapsedSeconds = 0;
+
+        // Initialize
+        window.addEventListener('load', () => {
+            gistId = localStorage.getItem('gistId') || '';
+            token = localStorage.getItem('token') || '';
+            
+            if (gistId) document.getElementById('gistId').value = gistId;
+            if (token) document.getElementById('token').value = token;
+        });
+
+        // UI Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showConfig() {
+            showScreen('config-screen');
+        }
+
+        function showDashboard() {
+            showScreen('dashboard-screen');
+            renderDashboard();
+        }
+
+        function showAddActivity() {
+            showScreen('add-activity-screen');
+            document.getElementById('activity-id').value = '';
+            document.getElementById('activity-name').value = '';
+            document.getElementById('activity-type').value = 'numeric';
+            document.getElementById('activity-description').value = '';
+        }
+
+        function showActivityDetail() {
+            showScreen('activity-detail-screen');
+            document.getElementById('activity-title').textContent = currentActivity.name;
+        }
+
+        function showLogEntry() {
+            if (currentActivity.type === 'timer') {
+                showScreen('log-timer-screen');
+                document.getElementById('log-timer-title').textContent = currentActivity.name;
+                resetTimer();
+                // Reset to timer mode
+                document.getElementById('mode-timer').checked = true;
+                toggleTimerMode();
+            } else {
+                showScreen('log-numeric-screen');
+                document.getElementById('log-numeric-title').textContent = currentActivity.name;
+                document.getElementById('numeric-count').value = '';
+            }
+        }
+
+        function showHistory() {
+            showScreen('history-screen');
+            document.getElementById('history-title').textContent = `${currentActivity.name} - History`;
+            renderHistory();
+        }
+
+        // Message handling
+        function showMessage(text, type = 'success') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type} show`;
+            
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Gist operations
+        async function loadGist() {
+            gistId = document.getElementById('gistId').value.trim();
+            token = document.getElementById('token').value.trim();
+
+            if (!gistId || !token) {
+                showMessage('Please enter both Gist ID and Token', 'error');
+                return;
+            }
+
+            localStorage.setItem('gistId', gistId);
+            localStorage.setItem('token', token);
+
+            try {
+                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load gist: ${response.status}`);
+                }
+
+                const gist = await response.json();
+                const filename = 'tracker_db.json';
+                
+                if (!gist.files || !gist.files[filename]) {
+                    // Initialize empty structure
+                    gistData = { activities: [], logs: {} };
+                } else {
+                    gistData = JSON.parse(gist.files[filename].content);
+                    if (!gistData.activities) gistData.activities = [];
+                    if (!gistData.logs) gistData.logs = {};
+                }
+
+                showMessage('✅ Activities loaded successfully!', 'success');
+                showDashboard();
+
+            } catch (error) {
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveToGist() {
+            try {
+                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        files: {
+                            'tracker_db.json': {
+                                content: JSON.stringify(gistData, null, 2)
+                            }
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update gist: ${response.status}`);
+                }
+
+                return true;
+            } catch (error) {
+                showMessage(`❌ Error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Activity management
+        function sanitizeId(raw) {
+            return raw.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+        }
+
+        async function saveNewActivity() {
+            const id = sanitizeId(document.getElementById('activity-id').value);
+            const name = document.getElementById('activity-name').value.trim();
+            const type = document.getElementById('activity-type').value;
+            const description = document.getElementById('activity-description').value.trim();
+
+            if (!id || !name) {
+                showMessage('Please enter ID and Name', 'error');
+                return;
+            }
+
+            if (!/^[a-z0-9\-]+$/.test(id)) {
+                showMessage('ID must contain only lowercase letters, numbers and hyphens', 'error');
+                return;
+            }
+
+            if (gistData.activities.find(a => a.id === id)) {
+                showMessage('Activity with this ID already exists', 'error');
+                return;
+            }
+
+            gistData.activities.push({ id, name, type, description });
+            
+            if (await saveToGist()) {
+                showMessage('✅ Activity added successfully!', 'success');
+                showDashboard();
+            }
+        }
+
+        // Logging
+        async function saveNumericEntry() {
+            const count = parseInt(document.getElementById('numeric-count').value);
+
+            if (!count || count <= 0) {
+                showMessage('Please enter a valid count', 'error');
+                return;
+            }
+
+            const entry = {
+                id: Date.now().toString(),
+                date: new Date().toISOString(),
+                count
+            };
+
+            if (!gistData.logs[currentActivity.id]) {
+                gistData.logs[currentActivity.id] = [];
+            }
+
+            gistData.logs[currentActivity.id].push(entry);
+
+            if (await saveToGist()) {
+                showMessage('✅ Entry saved!', 'success');
+                showActivityDetail();
+            }
+        }
+
+        async function saveTimerEntry() {
+            const entry = {
+                id: Date.now().toString(),
+                date: new Date().toISOString(),
+                durationSeconds: elapsedSeconds
+            };
+
+            if (!gistData.logs[currentActivity.id]) {
+                gistData.logs[currentActivity.id] = [];
+            }
+
+            gistData.logs[currentActivity.id].push(entry);
+
+            if (await saveToGist()) {
+                showMessage('✅ Entry saved!', 'success');
+                showActivityDetail();
+            }
+        }
+
+        // Timer functions
+        function formatDuration(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}m ${s}s`;
+        }
+
+        function updateTimerDisplay() {
+            const now = Date.now();
+            const currentElapsed = elapsedSeconds + Math.floor((now - startTime) / 1000);
+            document.getElementById('timer-display').textContent = formatDuration(currentElapsed);
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('timer-save-section').style.display = 'none';
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            elapsedSeconds += Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timer-display').textContent = formatDuration(elapsedSeconds);
+            
+            document.getElementById('btn-start').innerHTML = '▶️ Resume';
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('timer-save-section').style.display = 'block';
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            elapsedSeconds = 0;
+            document.getElementById('timer-display').textContent = '0m 0s';
+            document.getElementById('btn-start').innerHTML = '▶️ Start';
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            document.getElementById('timer-save-section').style.display = 'none';
+        }
+
+        function toggleTimerMode() {
+            const mode = document.querySelector('input[name="timer-mode"]:checked').value;
+            
+            if (mode === 'timer') {
+                document.getElementById('timer-mode-section').style.display = 'block';
+                document.getElementById('manual-mode-section').style.display = 'none';
+            } else {
+                document.getElementById('timer-mode-section').style.display = 'none';
+                document.getElementById('manual-mode-section').style.display = 'block';
+                // Reset manual inputs
+                document.getElementById('manual-minutes').value = '0';
+                document.getElementById('manual-seconds').value = '0';
+            }
+        }
+
+        async function saveManualTimerEntry() {
+            const minutes = parseInt(document.getElementById('manual-minutes').value) || 0;
+            const seconds = parseInt(document.getElementById('manual-seconds').value) || 0;
+            
+            const totalSeconds = (minutes * 60) + seconds;
+            
+            if (totalSeconds <= 0) {
+                showMessage('Please enter a valid time', 'error');
+                return;
+            }
+
+            const entry = {
+                id: Date.now().toString(),
+                date: new Date().toISOString(),
+                durationSeconds: totalSeconds
+            };
+
+            if (!gistData.logs[currentActivity.id]) {
+                gistData.logs[currentActivity.id] = [];
+            }
+
+            gistData.logs[currentActivity.id].push(entry);
+
+            if (await saveToGist()) {
+                showMessage('✅ Entry saved!', 'success');
+                showActivityDetail();
+            }
+        }
+
+        // Rendering
+        function renderDashboard() {
+            if (!gistData) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay());
+
+            let todayHtml = '';
+            let weekHtml = '';
+
+            gistData.activities.forEach(activity => {
+                const logs = gistData.logs[activity.id] || [];
+                let todayCount = 0, todaySum = 0, todayTime = 0;
+                let weekCount = 0, weekSum = 0, weekTime = 0;
+
+                logs.forEach(log => {
+                    const logDate = new Date(log.date);
+                    logDate.setHours(0, 0, 0, 0);
+
+                    if (logDate.getTime() === today.getTime()) {
+                        todayCount++;
+                        todaySum += log.count || 0;
+                        todayTime += log.durationSeconds || 0;
+                    }
+
+                    if (logDate >= weekStart && logDate <= today) {
+                        weekCount++;
+                        weekSum += log.count || 0;
+                        weekTime += log.durationSeconds || 0;
+                    }
+                });
+
+                if (todayCount > 0) {
+                    const detail = activity.type === 'timer' 
+                        ? `${Math.floor(todayTime / 60)}m total`
+                        : `${todaySum} total`;
+                    todayHtml += `<div class="activity-card"><strong>${activity.name}:</strong> ${todayCount} ${todayCount === 1 ? 'entry' : 'entries'} — ${detail}</div>`;
+                }
+
+                if (weekCount > 0) {
+                    const detail = activity.type === 'timer' 
+                        ? `${Math.floor(weekTime / 60)}m total`
+                        : `${weekSum} total`;
+                    weekHtml += `<div class="activity-card"><strong>${activity.name}:</strong> ${weekCount} ${weekCount === 1 ? 'entry' : 'entries'} — ${detail}</div>`;
+                }
+            });
+
+            document.getElementById('today-activities').innerHTML = todayHtml || '<p style="color: #999;">No activities today</p>';
+            document.getElementById('week-activities').innerHTML = weekHtml || '<p style="color: #999;">No activities this week</p>';
+
+            // Render activities list
+            let activitiesHtml = '';
+            gistData.activities.forEach(activity => {
+                activitiesHtml += `
+                    <div class="activity-card" onclick="selectActivity('${activity.id}')">
+                        <strong>${activity.name}</strong>
+                        <span class="activity-type">${activity.type}</span>
+                        ${activity.description ? `<div style="margin-top: 5px; font-size: 14px; color: #666;">${activity.description}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            document.getElementById('activities-list').innerHTML = activitiesHtml || '<p style="color: #999;">No activities yet. Add your first activity!</p>';
+        }
+
+        function selectActivity(activityId) {
+            currentActivity = gistData.activities.find(a => a.id === activityId);
+            showActivityDetail();
+        }
+
+        function renderHistory() {
+            const logs = gistData.logs[currentActivity.id] || [];
+
+            if (logs.length === 0) {
+                document.getElementById('history-stats').innerHTML = '';
+                document.getElementById('history-table').innerHTML = '<p style="color: #999;">No history found.</p>';
+                return;
+            }
+
+            // Calculate stats
+            let totalEntries = logs.length;
+            let totalDuration = 0;
+            let totalCount = 0;
+
+            logs.forEach(log => {
+                totalDuration += log.durationSeconds || 0;
+                totalCount += log.count || 0;
+            });
+
+            const lastEntry = logs[logs.length - 1];
+            const lastDate = new Date(lastEntry.date).toLocaleString();
+
+            let statsHtml = `
+                <div class="stat-box">
+                    <strong>${totalEntries}</strong>
+                    <div class="stat-label">Total Entries</div>
+                </div>
+            `;
+
+            if (currentActivity.type === 'timer') {
+                const avgDuration = Math.floor(totalDuration / totalEntries);
+                statsHtml += `
+                    <div class="stat-box">
+                        <strong>${formatDuration(totalDuration)}</strong>
+                        <div class="stat-label">Total Time</div>
+                    </div>
+                    <div class="stat-box">
+                        <strong>${formatDuration(avgDuration)}</strong>
+                        <div class="stat-label">Avg Duration</div>
+                    </div>
+                `;
+            } else {
+                statsHtml += `
+                    <div class="stat-box">
+                        <strong>${totalCount}</strong>
+                        <div class="stat-label">Total Count</div>
+                    </div>
+                `;
+            }
+
+            statsHtml += `
+                <div class="stat-box">
+                    <strong>${lastDate.split(',')[0]}</strong>
+                    <div class="stat-label">Last Entry</div>
+                </div>
+            `;
+
+            document.getElementById('history-stats').innerHTML = statsHtml;
+
+            // Render table
+            let tableHtml = '<table><thead><tr><th>Date</th>';
+            
+            if (currentActivity.type === 'timer') {
+                tableHtml += '<th>Duration</th>';
+            } else {
+                tableHtml += '<th>Count</th>';
+            }
+            
+            tableHtml += '</tr></thead><tbody>';
+
+            logs.slice().reverse().forEach(log => {
+                const date = new Date(log.date).toLocaleString();
+                const value = currentActivity.type === 'timer' 
+                    ? formatDuration(log.durationSeconds)
+                    : log.count;
+                
+                tableHtml += `<tr><td>${date}</td><td>${value}</td></tr>`;
+            });
+
+            tableHtml += '</tbody></table>';
+            document.getElementById('history-table').innerHTML = tableHtml;
+        }
+    </script>
+</body>
+</html>
